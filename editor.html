@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor WebAR · Villa Hortensia + Fantasma</title>
+<style>
+:root{color-scheme:light;--ink:#202124;--muted:#5f6368;--line:#d9dce1;--panel:#fff;--bg:#f3f5f7;--accent:#315f8a;--orange:#ef9223}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:#18212b;color:#fff;padding:22px max(18px,calc((100vw - 1240px)/2))}header h1{font-size:22px;margin:0 0 5px}header p{margin:0;color:#d8e0e8}
+main{max-width:1240px;margin:auto;padding:18px}.toolbar,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:14px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}button,.file-label{border:0;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;background:var(--accent);color:white;display:inline-flex;align-items:center;justify-content:center}
+button.secondary,.file-label.secondary{background:#e8edf2;color:#24272b}button:disabled{opacity:.45;cursor:not-allowed}#config-file{position:absolute;width:1px;height:1px;opacity:0}
+#load-state{flex:1 1 260px;color:var(--muted);font-size:13px}.notice{margin:0 0 14px;padding:11px 13px;border-radius:8px;background:#fff6dd;border:1px solid #e8cd7d;color:#51431b;font-size:13px}
+.layout{display:grid;grid-template-columns:minmax(320px,1fr) minmax(300px,410px);gap:16px;align-items:start}.panel h2{font-size:17px;margin:0 0 14px}.panel h3{font-size:14px;margin:18px 0 10px;padding-top:14px;border-top:1px solid var(--line)}.panel h3:first-of-type{margin-top:0;padding-top:0;border-top:0}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field.full{grid-column:1/-1}
+label{font-size:12px;font-weight:700;color:#35383d}input,select,textarea{width:100%;min-width:0;border:1px solid #bfc5cc;border-radius:7px;background:#fff;color:#202124;padding:9px 10px;font:14px Arial,Helvetica,sans-serif}textarea{min-height:100px;resize:vertical}input[type=checkbox]{width:auto;min-width:0;accent-color:var(--accent)}
+.help,.footer-note,.stage-note{font-size:12px;color:var(--muted);margin:8px 0 0}.scene-picker{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.scene-picker button{flex:1 1 60px;background:#e9edf1;color:#24272b;padding:9px 7px}.scene-picker button[aria-pressed=true]{background:var(--accent);color:#fff}
+.preview-panel{position:sticky;top:12px}.preview-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.preview-head .help{margin:0}.stage-wrap{display:flex;justify-content:center;padding:12px 0 8px}.stage{width:min(100%,340px);position:relative;aspect-ratio:1/1.414;border:2px dashed #929aa3;background:#e9ecef center/100% 100% no-repeat;overflow:hidden;touch-action:none}
+.stage:before{content:'VISTA PREVIA DEL AFICHE';position:absolute;left:0;right:0;top:4px;text-align:center;font-size:8px;letter-spacing:.08em;color:#65717d;text-shadow:0 1px 2px #fff;pointer-events:none;z-index:0}
+.preview-item{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;cursor:move;z-index:2}
+.preview-art{outline:1px dashed #315f8a;background:rgba(49,95,138,.1);color:#315f8a;font-size:10px;text-align:center;padding:3px;overflow:hidden}.preview-art img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.preview-text{white-space:pre-wrap;overflow:hidden;line-height:1.2;background:rgba(0,0,0,.56);color:#fff!important;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;padding:5px;text-align:center;overflow-wrap:anywhere;outline:1px dashed rgba(255,255,255,.7)}
+.preview-video{border:2px dashed var(--orange);background:repeating-linear-gradient(45deg,rgba(239,146,35,.16),rgba(239,146,35,.16) 8px,rgba(239,146,35,.04) 8px,rgba(239,146,35,.04) 16px);color:#5b3a12;font-size:11px;text-align:center;padding:6px}
+.cta-preview{position:absolute;z-index:5;left:50%;top:50%;transform:translate(-50%,-50%);width:82%;padding:12px;background:rgba(0,0,0,.8);color:white;border-radius:10px;text-align:center;font-size:11px}.cta-preview button{background:var(--orange);color:#211508;font-size:10px;padding:8px;margin-top:7px}
+[hidden]{display:none!important}.footer-note{margin:15px 0 4px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.preview-panel{position:static;grid-row:1}}@media(max-width:480px){main{padding:10px}.panel,.toolbar{padding:12px}.field-grid{gap:9px}.stage{width:min(100%,320px)}}
+</style>
+</head>
+<body>
+<header><h1>Editor visual · WebAR</h1><p>Villa Hortensia: cinco ilustraciones y una página final. Afiche 2: video transparente del fantasma.</p></header>
+<main>
+  <div class="toolbar">
+    <label class="file-label" for="config-file">Abrir config.json</label><input id="config-file" type="file" accept=".json,application/json">
+    <button id="download-config" disabled>Descargar config.json</button><button id="reload-config" class="secondary" disabled>Descartar cambios</button>
+    <div id="load-state">Primero cargá el config.json de la carpeta principal.</div>
+  </div>
+  <div class="notice">El editor modifica una copia en memoria. Al terminar, descargá el nuevo config.json y reemplazá el anterior dentro del proyecto. Los archivos PNG y de video se suben por separado a sus carpetas.</div>
+  <div class="layout">
+    <section>
+      <div class="panel">
+        <h2>Experiencia a editar</h2>
+        <div class="field-grid">
+          <div class="field full"><label for="experience-select">Elegir afiche</label><select id="experience-select" disabled><option>Cargá config.json primero</option></select></div>
+          <div class="field full"><label for="experience-name">Nombre interno</label><input id="experience-name" data-group="experience" data-key="name" type="text"></div>
+        </div>
+        <p class="help" id="target-summary">El afiche 1 está asociado al índice 0 y el afiche 2 al índice 1. No cambies esos índices.</p>
+      </div>
+
+      <div id="sequence-editor">
+        <div class="panel">
+          <h2>Escena a editar</h2>
+          <div class="scene-picker" id="scene-picker" aria-label="Elegir escena"></div>
+          <div id="scene-settings">
+            <div class="field-grid"><div class="field full"><label for="scene-label">Nombre para organizarte</label><input id="scene-label" data-group="scene" data-key="label" type="text"></div></div>
+            <h3>Ilustración PNG</h3>
+            <div class="field-grid">
+              <div class="field full"><label for="image-src">Ruta de la imagen</label><input id="image-src" data-group="image" data-key="src" spellcheck="false" placeholder="assets/images/scene-01.png"></div>
+              <div class="field"><label for="image-x">Posición X</label><input id="image-x" data-group="image" data-key="x" type="number" step="0.01"></div>
+              <div class="field"><label for="image-y">Posición Y</label><input id="image-y" data-group="image" data-key="y" type="number" step="0.01"></div>
+              <div class="field"><label for="image-z">Profundidad Z</label><input id="image-z" data-group="image" data-key="z" type="number" step="0.01"></div>
+              <div class="field"><label for="image-width">Ancho</label><input id="image-width" data-group="image" data-key="width" type="number" min="0.01" step="0.01"></div>
+              <div class="field"><label for="image-height">Alto (vacío = automático)</label><input id="image-height" data-group="image" data-key="height" type="number" min="0.01" step="0.01"></div>
+              <div class="field"><label for="image-opacity">Opacidad (0–1)</label><input id="image-opacity" data-group="image" data-key="opacity" type="number" min="0" max="1" step="0.05"></div>
+              <div class="field"><label for="image-animation">Animación</label><select id="image-animation" data-group="image" data-key="animation"><option value="none">Sin animación</option><option value="fade">Aparecer</option><option value="pop">Escala</option><option value="slide-up">Subir</option><option value="float">Flotar</option></select></div>
+              <div class="field"><label for="image-duration">Duración (ms)</label><input id="image-duration" data-group="image" data-key="durationMs" type="number" min="0" max="10000" step="50"></div>
+            </div>
+            <h3>Texto</h3>
+            <div class="field-grid">
+              <div class="field full"><label for="text-content">Contenido</label><textarea id="text-content" data-group="text" data-key="content"></textarea></div>
+              <div class="field full"><label for="text-font">Familia tipográfica</label><input id="text-font" data-group="text" data-key="fontFamily" list="font-options"><datalist id="font-options"><option value="Arial"><option value="Helvetica"><option value="Verdana"><option value="Georgia"><option value="Times New Roman"><option value="serif"><option value="sans-serif"></datalist></div>
+              <div class="field"><label for="text-size">Tamaño tipográfico</label><input id="text-size" data-group="text" data-key="fontSize" type="number" min="8" max="240"></div>
+              <div class="field"><label for="text-weight">Grosor</label><select id="text-weight" data-group="text" data-key="fontWeight"><option value="normal">Normal</option><option value="bold">Negrita</option><option value="600">600</option><option value="800">800</option></select></div>
+              <div class="field"><label for="text-color">Color</label><input id="text-color" data-group="text" data-key="color" type="color"></div>
+              <div class="field"><label for="text-align">Alineación</label><select id="text-align" data-group="text" data-key="align"><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option></select></div>
+              <div class="field"><label for="text-valign">Alineación vertical</label><select id="text-valign" data-group="text" data-key="verticalAlign"><option value="top">Arriba</option><option value="middle">Centro</option><option value="bottom">Abajo</option></select></div>
+              <div class="field"><label for="text-line-height">Interlineado</label><input id="text-line-height" data-group="text" data-key="lineHeight" type="number" min="0.8" max="2.5" step="0.1"></div>
+              <div class="field"><label for="text-opacity">Opacidad (0–1)</label><input id="text-opacity" data-group="text" data-key="opacity" type="number" min="0" max="1" step="0.05"></div>
+              <div class="field"><label for="text-x">Posición X</label><input id="text-x" data-group="text" data-key="x" type="number" step="0.01"></div>
+              <div class="field"><label for="text-y">Posición Y</label><input id="text-y" data-group="text" data-key="y" type="number" step="0.01"></div>
+              <div class="field"><label for="text-z">Profundidad Z</label><input id="text-z" data-group="text" data-key="z" type="number" step="0.01"></div>
+              <div class="field"><label for="text-width">Ancho del bloque</label><input id="text-width" data-group="text" data-key="width" type="number" min="0.05" step="0.01"></div>
+              <div class="field"><label for="text-height">Alto del bloque</label><input id="text-height" data-group="text" data-key="height" type="number" min="0.05" step="0.01"></div>
+              <div class="field"><label for="text-animation">Animación</label><select id="text-animation" data-group="text" data-key="animation"><option value="none">Sin animación</option><option value="fade">Aparecer</option><option value="pop">Escala</option><option value="slide-up">Subir</option><option value="float">Flotar</option></select></div>
+              <div class="field"><label for="text-duration">Duración (ms)</label><input id="text-duration" data-group="text" data-key="durationMs" type="number" min="0" max="10000" step="50"></div>
+            </div>
+            <p class="help">X y Y mueven la imagen o el texto. Z cambia la distancia respecto del afiche. También podés arrastrarlos en la vista previa.</p>
+          </div>
+          <div id="cta-settings" hidden>
+            <h3>Página final · Escena 6</h3>
+            <div class="field-grid">
+              <div class="field full"><label for="cta-heading">Texto que aparece arriba del botón</label><textarea id="cta-heading" data-group="cta" data-key="heading"></textarea></div>
+              <div class="field full"><label for="cta-button-label">Texto del botón naranja</label><input id="cta-button-label" data-group="cta" data-key="buttonLabel" type="text"></div>
+              <div class="field full"><label for="cta-url">Dirección de la página web</label><input id="cta-url" data-group="cta" data-key="url" type="url" placeholder="https://... "></div>
+            </div>
+            <p class="help">El botón abrirá la dirección en una pestaña nueva. Todavía podés dejar la URL vacía y completarla más adelante.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="video-editor" class="panel" hidden>
+        <h2>Video transparente · Afiche 2</h2>
+        <p class="help">El video empieza automáticamente cuando la cámara reconoce el segundo afiche. Se reproduce una vez y se reinicia al retirar y volver a enfocar el afiche.</p>
+        <div class="field-grid" style="margin-top:12px">
+          <div class="field full"><label for="video-webm">Archivo WebM VP9 con transparencia (Chrome / Android)</label><input id="video-webm" data-group="video" data-key="webmSrc" type="text" spellcheck="false" placeholder="assets/video/fantasma-alpha.webm"></div>
+          <div class="field full"><label for="video-mov">Archivo MOV HEVC con transparencia (Safari / iPhone)</label><input id="video-mov" data-group="video" data-key="safariMovSrc" type="text" spellcheck="false" placeholder="assets/video/fantasma-alpha.mov"></div>
+          <div class="field"><label for="video-x">Posición X</label><input id="video-x" data-group="video" data-key="x" type="number" step="0.01"></div>
+          <div class="field"><label for="video-y">Posición Y</label><input id="video-y" data-group="video" data-key="y" type="number" step="0.01"></div>
+          <div class="field"><label for="video-z">Profundidad Z</label><input id="video-z" data-group="video" data-key="z" type="number" step="0.01"></div>
+          <div class="field"><label for="video-width">Ancho</label><input id="video-width" data-group="video" data-key="width" type="number" min="0.01" step="0.01"></div>
+          <div class="field"><label for="video-height">Alto (vacío = automático)</label><input id="video-height" data-group="video" data-key="height" type="number" min="0.01" step="0.01"></div>
+          <div class="field"><label for="video-speed">Velocidad de reproducción</label><input id="video-speed" data-group="video" data-key="playbackRate" type="number" min="0.25" max="2.5" step="0.05"></div>
+          <div class="field"><label for="video-start">Segundo inicial</label><input id="video-start" data-group="video" data-key="startAt" type="number" min="0" step="0.1"></div>
+          <div class="field"><label for="video-duration">Duración esperada (segundos)</label><input id="video-duration" data-group="video" data-key="expectedDurationSec" type="number" min="0.1" step="0.1"></div>
+          <div class="field"><label for="video-loop">Repetir en bucle</label><select id="video-loop" data-group="video" data-key="loop"><option value="false">No, una sola vez</option><option value="true">Sí, repetir</option></select></div>
+        </div>
+        <p class="help">El tamaño y la posición se editan acá. El ancho y el alto se expresan en unidades relativas al afiche. Si dejás el alto vacío, se calcula según la proporción real del video.</p>
+        <p class="help"><strong>Importante:</strong> necesitás un archivo con canal alfa real. Un MP4 común no es transparente. Revisá el README antes de exportarlo.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Tipografías personalizadas (opcional)</h2>
+        <div class="field-grid">
+          <div class="field"><label for="font-family">Nombre de familia</label><input id="font-family" placeholder="MiTipografia"></div>
+          <div class="field"><label for="font-src">Ruta del .woff2/.woff</label><input id="font-src" placeholder="assets/fonts/fuente.woff2"></div>
+          <div class="field"><label for="font-weight">Grosor</label><select id="font-weight"><option value="normal">Normal</option><option value="bold">Negrita</option><option value="600">600</option><option value="800">800</option></select></div>
+          <div class="field"><label for="font-style">Estilo</label><select id="font-style"><option value="normal">Normal</option><option value="italic">Cursiva</option></select></div>
+          <div class="field full"><button id="add-font" class="secondary" type="button">Agregar tipografía</button></div>
+        </div>
+        <div id="font-list" class="footer-note">No hay tipografías personalizadas.</div>
+      </div>
+    </section>
+
+    <aside class="panel preview-panel">
+      <div class="preview-head"><h2>Vista previa</h2><p class="help">Arrastrá los elementos</p></div>
+      <div class="stage-wrap"><div id="preview-stage" class="stage"></div></div>
+      <p class="stage-note">El afiche original aparece como fondo de referencia. La vista previa sirve para ubicar elementos; verificá el tamaño final desde el celular.</p>
+      <p class="stage-note">En la segunda experiencia se muestra un marco de referencia para el video, porque todavía no se incluyó ningún video de prueba.</p>
+    </aside>
+  </div>
+  <p class="footer-note">Editor local: no sube tus archivos a ningún servidor. Solo descarga config.json. Después reemplazá el JSON del proyecto en GitHub y subí por separado las imágenes o videos que hayas agregado.</p>
+</main>
+<script>
+(() => {
+'use strict';
+const $=s=>document.querySelector(s);const fileInput=$('#config-file'),loadState=$('#load-state'),download=$('#download-config'),reload=$('#reload-config');
+const experienceSelect=$('#experience-select'),scenePicker=$('#scene-picker'),stage=$('#preview-stage');
+let config=null,originalText='',selectedExperienceIndex=0,selectedSceneIndex=0,dragCleanup=null;
+const getExp=()=>config?.experiences[selectedExperienceIndex];const getScene=()=>getExp()?.scenes[selectedSceneIndex];const getTarget=()=>getExp()?.target||{width:1,height:1.414};
+const num=(v,f)=>{const n=Number(v);return Number.isFinite(n)?n:f;};
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function populateExperience(){experienceSelect.innerHTML='';config.experiences.forEach((e,i)=>{const op=document.createElement('option');op.value=String(i);op.textContent=`${e.name} · afiche ${e.targetIndex+1}`;experienceSelect.appendChild(op);});experienceSelect.disabled=false;}
+function setValue(group,key,value){const el=document.querySelector(`[data-group="${group}"][data-key="${key}"]`);if(el)el.value=value===null||value===undefined?'':String(value);}
+function renderScenePicker(){scenePicker.innerHTML='';getExp().scenes.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.dataset.scene=String(i);b.textContent=String(i+1);b.setAttribute('aria-pressed',String(i===selectedSceneIndex));scenePicker.appendChild(b);});}
+function renderControls(){
+ const exp=getExp();if(!exp)return;
+ experienceSelect.value=String(selectedExperienceIndex);setValue('experience','name',exp.name);
+ $('#target-summary').textContent=`Este contenido se activa con el afiche ${exp.targetIndex+1}. No cambies el índice ${exp.targetIndex}; debe coincidir con el orden de compilación del archivo .mind.`;
+ const isVideo=exp.mode==='video';$('#sequence-editor').hidden=isVideo;$('#video-editor').hidden=!isVideo;
+ if(isVideo){const v=exp.video;['webmSrc','safariMovSrc','x','y','z','width','height','playbackRate','startAt','expectedDurationSec','loop'].forEach(k=>setValue('video',k,v[k]));return;}
+ renderScenePicker();const scene=getScene();const isCta=selectedSceneIndex===5||scene.type==='cta';$('#scene-settings').hidden=isCta;$('#cta-settings').hidden=!isCta;
+ setValue('scene','label',scene.label);
+ if(isCta){const c=exp.cta||{};['heading','buttonLabel','url'].forEach(k=>setValue('cta',k,c[k]));}
+ else{
+   ['src','x','y','z','width','height','opacity','animation','durationMs'].forEach(k=>setValue('image',k,scene.image[k]));
+   ['content','fontFamily','fontSize','fontWeight','color','align','verticalAlign','lineHeight','opacity','x','y','z','width','height','animation','durationMs'].forEach(k=>setValue('text',k,scene.text[k]));
+ }
+}
+function setInputModel(group,key,value){
+ const exp=getExp();if(!exp)return;
+ let target;
+ if(group==='experience')target=exp;
+ else if(group==='target')target=exp.target;
+ else if(group==='scene')target=getScene();
+ else if(group==='image'||group==='text')target=getScene()[group];
+ else if(group==='cta')target=exp.cta;
+ else if(group==='video')target=exp.video;
+ if(!target)return;
+ const el=document.querySelector(`[data-group="${group}"][data-key="${key}"]`);
+ if(group==='video'&&key==='loop')value=value==='true';
+ else if(el&&el.type==='number')value=value===''?null:Number(value);
+ target[key]=value;
+}
+function onInput(e){const el=e.target;const group=el.dataset.group,key=el.dataset.key;if(!group||!key||!config)return;setInputModel(group,key,el.value);renderPreview();}
+function percentX(x){return (0.5+num(x,0)/Math.max(.1,getTarget().width))*100;}
+function percentY(y){return (0.5-num(y,0)/Math.max(.1,getTarget().height))*100;}
+function installDrag(item,group,obj){item.addEventListener('pointerdown',ev=>{if(ev.button!==0)return;ev.preventDefault();if(dragCleanup)dragCleanup();const ei=selectedExperienceIndex,si=selectedSceneIndex;const move=me=>{if(!config||ei!==selectedExperienceIndex||si!==selectedSceneIndex)return;const r=stage.getBoundingClientRect();const xr=Math.max(0,Math.min(1,(me.clientX-r.left)/r.width));const yr=Math.max(0,Math.min(1,(me.clientY-r.top)/r.height));obj.x=Number(((xr-.5)*num(getTarget().width,1)).toFixed(3));obj.y=Number(((.5-yr)*num(getTarget().height,1.414)).toFixed(3));setValue(group,'x',obj.x);setValue(group,'y',obj.y);item.style.left=`${xr*100}%`;item.style.top=`${yr*100}%`;};const end=()=>cleanup();const cleanup=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',end);window.removeEventListener('pointercancel',end);if(dragCleanup===cleanup)dragCleanup=null;};dragCleanup=cleanup;window.addEventListener('pointermove',move);window.addEventListener('pointerup',end,{once:true});window.addEventListener('pointercancel',end,{once:true});});}
+function createPositionItem(kind,obj){const item=document.createElement('div');item.className=`preview-item ${kind==='image'?'preview-art':kind==='text'?'preview-text':'preview-video'}`;item.style.left=`${percentX(obj.x)}%`;item.style.top=`${percentY(obj.y)}%`;const w=num(obj.width,.82);item.style.width=`${Math.max(1,w/Math.max(.1,getTarget().width)*100)}%`;
+ if(kind==='text'){item.style.height=`${Math.max(2,num(obj.height,.32)/Math.max(.1,getTarget().height)*100)}%`;item.style.color=obj.color||'#fff';item.style.fontFamily=obj.fontFamily||'Arial';item.style.fontWeight=obj.fontWeight||'normal';item.style.fontSize=`${Math.max(7,num(obj.fontSize,58)/1024*Math.max(20,stage.clientWidth*w/Math.max(.1,getTarget().width)))}px`;item.style.lineHeight=String(num(obj.lineHeight,1.2));item.style.textAlign=obj.align||'center';item.style.alignItems=obj.verticalAlign==='top'?'flex-start':obj.verticalAlign==='bottom'?'flex-end':'center';item.textContent=obj.content||'Texto de escena';}
+ else if(kind==='image'){let h=num(obj.height,null);if(h===null)h=w*.72;item.style.height=`${Math.max(2,h/Math.max(.1,getTarget().height)*100)}%`;if(obj.src){const img=document.createElement('img');img.alt='';img.draggable=false;img.src=obj.src;img.onload=()=>{if((obj.height===null||obj.height===undefined||obj.height==='')&&img.naturalWidth)item.style.height=`${w*img.naturalHeight/img.naturalWidth/Math.max(.1,getTarget().height)*100}%`;};img.onerror=()=>{img.remove();item.textContent='PNG pendiente';};item.appendChild(img);}else item.textContent='PNG pendiente';}
+ else{const h=num(obj.height,null);item.style.height=`${Math.max(4,(h===null?w*.56:h)/Math.max(.1,getTarget().height)*100)}%`;item.textContent='VIDEO TRANSPARENTE · 8 SEGUNDOS';}
+ installDrag(item,kind==='video'?'video':kind,obj);return item;}
+function renderPreview(){if(!config)return;const exp=getExp();stage.innerHTML='';stage.style.aspectRatio=`${Math.max(.1,num(exp.target.width,1))}/${Math.max(.1,num(exp.target.height,1.414))}`;
+ const poster=exp.targetIndex===0?'targets/source-posters/01-afiche-villa-hortensia.png':'targets/source-posters/02-afiche-escalera-fantasma.png';stage.style.backgroundImage=`url("${poster}")`;
+ if(exp.mode==='video'){stage.appendChild(createPositionItem('video',exp.video));return;}
+ if(selectedSceneIndex===5){const card=document.createElement('div');card.className='cta-preview';card.innerHTML=`<div>${escapeHtml(exp.cta?.heading||'Visita la página web para conocer más sobre el barrio y sus historias')}</div><button type="button">${escapeHtml(exp.cta?.buttonLabel||'Haz clic para ir a la página')}</button>`;stage.appendChild(card);return;}
+ const scene=getScene();stage.appendChild(createPositionItem('image',scene.image));stage.appendChild(createPositionItem('text',scene.text));}
+function renderFontList(){const fonts=config?.project?.fonts||[];$('#font-list').textContent=fonts.length?fonts.map(f=>`${f.family}: ${f.src}`).join(' · '):'No hay tipografías personalizadas.';}
+function loadFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const parsed=JSON.parse(String(reader.result));if(!Array.isArray(parsed.experiences)||parsed.experiences.length!==2)throw new Error('El JSON debe contener exactamente dos experiencias.');if(parsed.experiences[0].mode!=='sequence'||parsed.experiences[0].scenes?.length!==6)throw new Error('La primera experiencia debe tener seis escenas.');if(parsed.experiences[1].mode!=='video'||!parsed.experiences[1].video)throw new Error('La segunda experiencia debe tener la configuración del video.');config=parsed;originalText=JSON.stringify(parsed,null,2);selectedExperienceIndex=0;selectedSceneIndex=0;populateExperience();renderControls();renderFontList();renderPreview();download.disabled=false;reload.disabled=false;loadState.textContent='Configuración cargada. Elegí la experiencia y modificá los campos.';}catch(err){config=null;download.disabled=true;reload.disabled=true;loadState.textContent=`No pude abrir el JSON: ${err.message}`;}};reader.onerror=()=>loadState.textContent='No se pudo leer el archivo.';reader.readAsText(file);}
+function downloadConfig(){if(!config)return;const blob=new Blob([JSON.stringify(config,null,2)+'\n'],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='config.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);loadState.textContent='Descarga iniciada. Reemplazá el config.json del proyecto por este archivo.';}
+fileInput.addEventListener('change',()=>loadFile(fileInput.files?.[0]));
+experienceSelect.addEventListener('change',()=>{if(!config)return;if(dragCleanup)dragCleanup();selectedExperienceIndex=Number(experienceSelect.value);selectedSceneIndex=0;renderControls();renderPreview();});
+scenePicker.addEventListener('click',e=>{const b=e.target.closest('button[data-scene]');if(!b||!config)return;if(dragCleanup)dragCleanup();selectedSceneIndex=Number(b.dataset.scene);renderControls();renderPreview();});
+document.querySelectorAll('[data-group]').forEach(el=>{el.addEventListener('input',onInput);el.addEventListener('change',onInput);});
+download.addEventListener('click',downloadConfig);
+reload.addEventListener('click',()=>{if(!originalText)return;config=JSON.parse(originalText);selectedExperienceIndex=0;selectedSceneIndex=0;renderControls();renderFontList();renderPreview();loadState.textContent='Se descartaron los cambios de esta sesión.';});
+$('#add-font').addEventListener('click',()=>{if(!config)return;const family=$('#font-family').value.trim(),src=$('#font-src').value.trim();if(!family||!src){loadState.textContent='Indicá el nombre de la familia y la ruta del archivo de fuente.';return;}config.project.fonts=config.project.fonts||[];const entry={family,src,weight:$('#font-weight').value,style:$('#font-style').value};const idx=config.project.fonts.findIndex(f=>f.family.toLowerCase()===family.toLowerCase());if(idx>=0)config.project.fonts[idx]=entry;else config.project.fonts.push(entry);renderFontList();loadState.textContent=`Se agregó la fuente ${family}. Recordá subir su archivo a la carpeta assets/fonts.`;});
+})();
+</script>
+</body>
+</html>

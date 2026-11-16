@@ -1,0 +1,3 @@
+ILUSTRACIONES DE VILLA HORTENSIA
+
+Se conservaron las cinco imágenes PNG originales de la primera experiencia. No las cambies de nombre ni ubicación salvo que también actualices sus rutas en config.json.

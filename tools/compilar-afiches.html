@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compilar los dos afiches · MindAR</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:24px 16px;background:#f2f4f6;color:#20242a;font:15px/1.5 Arial,Helvetica,sans-serif}
+main{max-width:850px;margin:auto;background:#fff;padding:24px;border:1px solid #d8dde3;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.06)}
+h1{font-size:24px;margin:0 0 8px}p{color:#555e68}.targets{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}.target{border:1px solid #d8dde3;border-radius:12px;padding:12px}.target img{display:block;width:100%;max-height:340px;object-fit:contain;background:#eef0f2}.target strong{display:block;margin:8px 0 4px}.tag{display:inline-block;padding:3px 8px;border-radius:20px;background:#e8eef6;color:#284e72;font-size:12px;font-weight:700}
+button,a.download{display:inline-flex;align-items:center;justify-content:center;background:#315f8a;color:#fff;border:0;border-radius:9px;padding:12px 18px;font-weight:700;font-size:15px;text-decoration:none;cursor:pointer}button:disabled{opacity:.5;cursor:wait}.progress{height:12px;border-radius:20px;background:#e6e9ed;overflow:hidden;margin:16px 0}.bar{height:100%;width:0;background:#2f9b68;transition:width .2s}.status{padding:12px;border-radius:9px;background:#f2f5f8;white-space:pre-line}.status.error{background:#fff1ef;color:#8a2519}.download{display:none;margin-top:12px}.steps{padding-left:20px}.steps li{margin:6px 0}.warning{padding:12px;border-left:4px solid #e39a34;background:#fff8e9;margin:18px 0}
+@media(max-width:600px){.targets{grid-template-columns:1fr}main{padding:17px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Generar el archivo de reconocimiento de los dos afiches</h1>
+  <p>Esta herramienta compila automáticamente las dos imágenes guardadas en el proyecto y descarga un único archivo <strong>poster.mind</strong>. La compilación se realiza en este navegador usando MindAR; las imágenes no se envían a un servicio externo.</p>
+  <div class="targets">
+    <section class="target"><span class="tag">Índice 0</span><strong>1 · Villa Hortensia</strong><img src="../targets/source-posters/01-afiche-villa-hortensia.png" alt="Afiche 1: Villa Hortensia"></section>
+    <section class="target"><span class="tag">Índice 1</span><strong>2 · Video del fantasma</strong><img src="../targets/source-posters/02-afiche-escalera-fantasma.png" alt="Afiche 2: escalera y fantasma"></section>
+  </div>
+  <div class="warning"><strong>Importante:</strong> no cambies el orden. El afiche Villa Hortensia tiene que quedar primero (índice 0) y el afiche de la escalera segundo (índice 1). Usá esta herramienta desde una computadora con internet y dejá que termine la compilación.</div>
+  <button id="compile" type="button">Compilar los dos afiches</button>
+  <div class="progress" aria-label="Progreso"><div id="bar" class="bar"></div></div>
+  <div id="status" class="status" role="status">Listo para compilar. Al terminar se habilitará la descarga de poster.mind.</div>
+  <a id="download" class="download" download="poster.mind">Descargar poster.mind</a>
+  <h2>Después de descargar</h2>
+  <ol class="steps">
+    <li>Descargá el archivo <code>poster.mind</code>.</li>
+    <li>En tu repositorio GitHub, abrí la carpeta <code>targets</code>.</li>
+    <li>Subí ahí el archivo descargado, conservando exactamente el nombre <code>poster.mind</code>.</li>
+    <li>Confirmá los cambios (Commit changes) y esperá que GitHub Pages actualice el sitio.</li>
+    <li>Volvé a abrir el enlace principal desde el celular y probá ambos afiches.</li>
+  </ol>
+  <p><a href="../index.html">Volver a la experiencia WebAR</a></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
+<script>
+(() => {
+  const button=document.querySelector('#compile');
+  const bar=document.querySelector('#bar');
+  const status=document.querySelector('#status');
+  const download=document.querySelector('#download');
+  const sources=[
+    {name:'01-afiche-villa-hortensia.png',url:'../targets/source-posters/01-afiche-villa-hortensia.png'},
+    {name:'02-afiche-escalera-fantasma.png',url:'../targets/source-posters/02-afiche-escalera-fantasma.png'}
+  ];
+  const loadImage=(url)=>new Promise((resolve,reject)=>{
+    const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error(`No se pudo cargar ${url}. Verificá que el archivo esté subido a GitHub.`));img.src=url;
+  });
+  button.addEventListener('click',async()=>{
+    button.disabled=true;download.style.display='none';bar.style.width='0%';status.classList.remove('error');
+    try{
+      if(!window.MINDAR?.IMAGE?.Compiler)throw new Error('No se pudo cargar el compilador MindAR. Revisá la conexión a internet y recargá esta página.');
+      status.textContent='Cargando los dos afiches…';
+      const images=[];for(const source of sources)images.push(await loadImage(source.url));
+      status.textContent='Analizando las imágenes. Este proceso puede tardar varios minutos. No cierres esta pestaña.';
+      const compiler=new window.MINDAR.IMAGE.Compiler();
+      await compiler.compileImageTargets(images,(progress)=>{
+        const p=Number(progress);const percent=Math.max(0,Math.min(100,p<=1?p*100:p));bar.style.width=`${percent.toFixed(0)}%`;status.textContent=`Compilando los dos afiches… ${percent.toFixed(0)}%`;
+      });
+      const buffer=await compiler.exportData();
+      if(!buffer||buffer.byteLength<1000)throw new Error('MindAR no devolvió un archivo válido. Probá nuevamente con imágenes originales de buena calidad.');
+      const blob=new Blob([buffer],{type:'application/octet-stream'});const url=URL.createObjectURL(blob);
+      download.href=url;download.style.display='inline-flex';download.textContent='Descargar poster.mind';
+      bar.style.width='100%';status.textContent='Compilación terminada. Se generó un único archivo con dos afiches en el orden correcto. Descargá poster.mind y subilo a la carpeta targets del repositorio.';
+    }catch(error){console.error(error);status.classList.add('error');status.textContent=`No se pudo completar la compilación.\n${error.message||error}`;}
+    finally{button.disabled=false;}
+  });
+})();
+</script>
+</body>
+</html>

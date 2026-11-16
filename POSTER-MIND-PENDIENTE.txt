@@ -1,0 +1,5 @@
+ANTES DE PROBAR EN EL CELULAR:
+
+El poster.mind combinado aún debe generarse. Publicá la carpeta en GitHub Pages y abrí tools/compilar-afiches.html desde una computadora. La herramienta compila los dos PNG de targets/source-posters/ en el orden correcto y descarga poster.mind. Subí ese archivo a esta carpeta targets/ con ese nombre exacto.
+
+El archivo poster-villa-hortensia-anterior-un-solo-afiche.mind es solo un respaldo de la versión anterior y NO sustituye el archivo nuevo.

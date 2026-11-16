@@ -1,0 +1,7 @@
+ARCHIVOS DE RECONOCIMIENTO
+
+- source-posters/ contiene los DOS afiches originales en el orden exacto de compilación.
+- poster.mind todavía debe generarse una vez con tools/compilar-afiches.html y subirse a esta carpeta.
+- poster-villa-hortensia-anterior-un-solo-afiche.mind es un respaldo de la versión anterior; NO se usa en este proyecto y no debe renombrarse a poster.mind.
+
+Orden obligatorio: índice 0 = Villa Hortensia; índice 1 = video del fantasma.

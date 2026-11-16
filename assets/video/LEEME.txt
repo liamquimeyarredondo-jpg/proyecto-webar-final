@@ -1,0 +1,7 @@
+VIDEO DEL FANTASMA
+
+Colocá aquí los archivos finales con transparencia real:
+- fantasma-alpha.webm (VP9 con canal alfa) para Chrome/Android y otros navegadores Chromium.
+- fantasma-alpha.mov (HEVC con canal alfa) para Safari/iPhone.
+
+Los nombres y rutas se pueden cambiar desde editor.html o config.json. El MP4/H.264 común NO conserva un canal alfa real. Consultá README.md antes de exportar.

@@ -1,0 +1,278 @@
+{
+  "version": 3,
+  "project": {
+    "title": "WebAR · Villa Hortensia + Fantasma",
+    "language": "es",
+    "fonts": []
+  },
+  "tracker": {
+    "src": "./targets/poster.mind",
+    "maxTrack": 1,
+    "orderedTargets": [
+      {
+        "order": 1,
+        "targetIndex": 0,
+        "file": "targets/source-posters/01-afiche-villa-hortensia.png",
+        "experienceId": "villa-hortensia"
+      },
+      {
+        "order": 2,
+        "targetIndex": 1,
+        "file": "targets/source-posters/02-afiche-escalera-fantasma.png",
+        "experienceId": "fantasma-video"
+      }
+    ]
+  },
+  "interface": {
+    "continuePrompt": "Pulse la imagen para continuar",
+    "finalPrompt": "Fin de la experiencia",
+    "notFoundPrompt": "Apuntá la cámara a uno de los dos afiches",
+    "loadingPrompt": "Preparando la cámara…",
+    "videoPrompt": "Reproduciendo el video del fantasma…",
+    "videoEndedPrompt": "El video terminó. Tocá el afiche para repetirlo."
+  },
+  "experiences": [
+    {
+      "id": "villa-hortensia",
+      "name": "Villa Hortensia",
+      "targetIndex": 0,
+      "target": {
+        "width": 1,
+        "height": 1.414,
+        "index": 0
+      },
+      "scenes": [
+        {
+          "id": 1,
+          "label": "Escena 1",
+          "image": {
+            "src": "assets/images/scene-01.png",
+            "x": 0.01,
+            "y": 0.198,
+            "z": 0.18,
+            "width": 1.04,
+            "height": null,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          },
+          "text": {
+            "content": "En 1890, José Nicolás Puccio mandó construir una enorme mansión en el pueblo de Alberdi. Rodeada de jardines y cerca del río Paraná, la casa tenía grandes escaleras, salones elegantes y una torre desde la que se podía contemplar el paisaje.",
+            "x": -0.006,
+            "y": -0.359,
+            "z": 0.22,
+            "width": 0.88,
+            "height": 0.32,
+            "fontFamily": "Arial",
+            "fontSize": 50,
+            "fontWeight": "normal",
+            "color": "#FFFFFF",
+            "align": "center",
+            "verticalAlign": "middle",
+            "lineHeight": 1.2,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          }
+        },
+        {
+          "id": 2,
+          "label": "Escena 2",
+          "image": {
+            "src": "assets/images/scene-02.png",
+            "x": -0.016,
+            "y": 0.073,
+            "z": 0.18,
+            "width": 1.03,
+            "height": null,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          },
+          "text": {
+            "content": "Con los años, la mansión pasó a otras familias hasta llegar a Alfredo Rouillón, quien la llamó Villa Hortensia en honor a su esposa, María Hortensia. Allí se reunían familiares y visitantes, y sus habitaciones se llenaban de voces, encuentros y celebraciones.",
+            "x": 0,
+            "y": -0.43,
+            "z": 0.22,
+            "width": 0.88,
+            "height": 0.32,
+            "fontFamily": "Arial",
+            "fontSize": 48,
+            "fontWeight": "normal",
+            "color": "#FFFFFF",
+            "align": "center",
+            "verticalAlign": "middle",
+            "lineHeight": 1.2,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          }
+        },
+        {
+          "id": 3,
+          "label": "Escena 3",
+          "image": {
+            "src": "assets/images/scene-03.png",
+            "x": 0.005,
+            "y": 0.132,
+            "z": 0.18,
+            "width": 1.01,
+            "height": null,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          },
+          "text": {
+            "content": "Pero el tiempo pasó y la casa comenzó a deteriorarse. Cuando quedó abandonada, surgieron historias extrañas: algunos hablaban de puertas que se cerraban solas, ruidos inexplicables y figuras que aparecían en los pasillos. Así nació la leyenda del fantasma de Villa Hortensia.",
+            "x": 0,
+            "y": -0.43,
+            "z": 0.22,
+            "width": 0.88,
+            "height": 0.46,
+            "fontFamily": "Arial",
+            "fontSize": 53,
+            "fontWeight": "normal",
+            "color": "#FFFFFF",
+            "align": "center",
+            "verticalAlign": "middle",
+            "lineHeight": 1.2,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          }
+        },
+        {
+          "id": 4,
+          "label": "Escena 4",
+          "image": {
+            "src": "assets/images/scene-04.png",
+            "x": -0.032,
+            "y": 0.111,
+            "z": 0.18,
+            "width": 1.07,
+            "height": null,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          },
+          "text": {
+            "content": "Algunos relatos aseguraban que, al caer la noche, todavía se sentía una presencia entre las habitaciones. ¿Serían los espíritus de quienes habían vivido allí o simplemente los ecos de una casa cargada de recuerdos? Nadie pudo demostrarlo, y el misterio siguió creciendo entre los vecinos.",
+            "x": 0,
+            "y": -0.43,
+            "z": 0.22,
+            "width": 0.88,
+            "height": 0.4,
+            "fontFamily": "Arial",
+            "fontSize": 50,
+            "fontWeight": "normal",
+            "color": "#FFFFFF",
+            "align": "center",
+            "verticalAlign": "middle",
+            "lineHeight": 1.2,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          }
+        },
+        {
+          "id": 5,
+          "label": "Escena 5",
+          "image": {
+            "src": "assets/images/scene-05.png",
+            "x": -0.006,
+            "y": 0.083,
+            "z": 0.18,
+            "width": 1.04,
+            "height": null,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          },
+          "text": {
+            "content": "En 1996, la Municipalidad de Rosario compró la casona y la restauró. Al año siguiente abrió allí el Centro Municipal de Distrito Norte. Hoy, Villa Hortensia sigue en pie, guardando su historia entre paredes centenarias. Y quién sabe… quizá, cuando cae la noche, el viejo fantasma todavía recorra sus pasillos.",
+            "x": 0,
+            "y": -0.43,
+            "z": 0.22,
+            "width": 0.88,
+            "height": 0.37,
+            "fontFamily": "Arial",
+            "fontSize": 49,
+            "fontWeight": "normal",
+            "color": "#FFFFFF",
+            "align": "center",
+            "verticalAlign": "middle",
+            "lineHeight": 1.2,
+            "opacity": 1,
+            "animation": "float",
+            "durationMs": 6000
+          }
+        },
+        {
+          "id": 6,
+          "label": "Visita la página web",
+          "type": "cta",
+          "image": {
+            "src": "",
+            "x": 0,
+            "y": 0,
+            "z": 0.18,
+            "width": 0.82,
+            "height": null,
+            "opacity": 1,
+            "animation": "none",
+            "durationMs": 0
+          },
+          "text": {
+            "content": "",
+            "x": 0,
+            "y": -0.43,
+            "z": 0.22,
+            "width": 0.88,
+            "height": 0.32,
+            "fontFamily": "Arial",
+            "fontSize": 58,
+            "fontWeight": "normal",
+            "color": "#FFFFFF",
+            "align": "center",
+            "verticalAlign": "middle",
+            "lineHeight": 1.2,
+            "opacity": 1,
+            "animation": "none",
+            "durationMs": 0
+          }
+        }
+      ],
+      "mode": "sequence",
+      "currentSceneIndex": 0,
+      "cta": {
+        "heading": "Visita la página web para conocer más sobre el barrio y sus historias",
+        "buttonLabel": "Haz clic para ir a la página",
+        "url": "https://www.figma.com/proto/4TooAhawQEqccu7AH8Fsfu/Laboratorio?node-id=1-2&t=WATIEpJXMEyOYLHF-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2"
+      }
+    },
+    {
+      "id": "fantasma-video",
+      "name": "Video del fantasma",
+      "mode": "video",
+      "targetIndex": 1,
+      "target": {
+        "width": 1,
+        "height": 1.414,
+        "index": 1
+      },
+      "video": {
+        "webmSrc": "assets/video/fantasma-alpha.webm",
+        "safariMovSrc": "assets/video/fantasma-alpha.mov",
+        "x": 0,
+        "y": 0.04,
+        "z": 0.22,
+        "width": 0.72,
+        "height": null,
+        "playbackRate": 1,
+        "loop": true,
+        "startAt": 0,
+        "expectedDurationSec": 8
+      }
+    }
+  ]
+}
